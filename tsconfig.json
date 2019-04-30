@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "importHelpers": true,
+    "target": "es5",
+    "declaration": true,
+    "lib": [ "dom", "es2015", "es2016" ],
+    "baseUrl": "./",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "typeRoots" : ["./typings"],
+    "outDir": "./dist",
+    "paths": {
+      "src/*": ["src/*"]
+    }
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}
