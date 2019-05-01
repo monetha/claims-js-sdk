@@ -2,6 +2,8 @@ import BigNumber from 'bignumber.js';
 import { MonethaClaimHandler } from '../contracts/MonethaClaimHandler';
 import { MonethaToken } from '../contracts/MonethaToken';
 import { IClaim } from '../models/claim';
+import { IDeferredTransactionWrapper } from '../models/tx';
+import { ITxParams } from '../contracts/typechain-runtime';
 export interface IOptions {
     web3: any;
     claimsHandlerContractAddress: string;
@@ -44,7 +46,7 @@ export declare class ClaimManager {
      * IMPORTANT: Transaction will only succeed if Monetha token contract has enough allowance to transfer staked MTH tokens from user's
      * wallet to claims handler contract. You can check existing allowance by calling `getAllowance` method and approve allowance by `allowTx`
      */
-    createTx(payload: ICreateClaimPayload): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    createTx(payload: ICreateClaimPayload): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Creates transaction for accepting a dispute.
      * This transaction transfers staked amount of MTH tokens from user's (respondent's)
@@ -55,14 +57,14 @@ export declare class ClaimManager {
      * IMPORTANT: Transaction will only succeed if Monetha token contract has enough allowance to transfer staked MTH tokens from user's
      * wallet to claims handler contract. You can check existing allowance by calling `getAllowance` method and approve allowance by `allowTx`
      */
-    acceptTx(claimId: number): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    acceptTx(claimId: number): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Creates transaction for resolving a dispute.
      * This transaction stores resolution note to blockchain and transfers respondent's staked MTH tokens back to respondent's wallet.
      *
      * Claim must be in `AwaitingResolution` state before executing this transaction and can only be executed by respondent.
      */
-    resolveTx(claimId: number, resolutionNote: string): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    resolveTx(claimId: number, resolutionNote: string): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Creates transaction for closing a dispute.
      * This transaction closes the dispute and no further action can be performed with it. It also transfers requester's staked
@@ -73,7 +75,7 @@ export declare class ClaimManager {
      * - `AwaitingResolution` and resolution period must be expired
      * - `AwaitingConfirmation`
      */
-    closeTx(claimId: number): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    closeTx(claimId: number): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Gets dispute by id
      */
@@ -84,11 +86,11 @@ export declare class ClaimManager {
      * NOTE: if there is already any existing allowance - it must be cleared first or else the transaction will fail.
      * You can check existing allowance using `getAllowance` and clear it with `clearAllowanceTx`.
      */
-    allowTx(tokens: BigNumber): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    allowTx(tokens: BigNumber): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Creates transaction which clears existing amount of MTH tokens which are allowed to be transfered from user's wallet to claims contract
      */
-    clearAllowanceTx(): import("../contracts/typechain-runtime").DeferredTransactionWrapper<import("../contracts/typechain-runtime").ITxParams>;
+    clearAllowanceTx(): IDeferredTransactionWrapper<ITxParams>;
     /**
      * Gets allowed amount of MTH tokens to be transferred from user's wallet to claims contract
      */

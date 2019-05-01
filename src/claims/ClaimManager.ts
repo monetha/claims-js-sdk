@@ -4,6 +4,8 @@ import { MonethaToken } from 'src/contracts/MonethaToken';
 import { IClaim } from 'src/models/claim';
 import { blockchainTokensToFloat, floatTokensToBlockchain } from 'src/utils/conversion';
 import { validateNotEmpty } from 'src/utils/validation';
+import { IDeferredTransactionWrapper } from 'src/models/tx';
+import { ITxParams } from 'src/contracts/typechain-runtime';
 
 // #region -------------- Interfaces -------------------------------------------------------------------
 
@@ -84,7 +86,10 @@ export class ClaimManager {
 
     const bcTokens = floatTokensToBlockchain(new BigNumber(tokens));
 
-    return this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
+    const tx = this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens) as IDeferredTransactionWrapper<ITxParams>;
+    tx.contractAddress = this.claimHandler.address;
+
+    return tx;
   }
 
   /**
@@ -100,7 +105,10 @@ export class ClaimManager {
   public acceptTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    return this.claimHandler.acceptTx(claimId);
+    const tx = this.claimHandler.acceptTx(claimId) as IDeferredTransactionWrapper<ITxParams>;
+    tx.contractAddress = this.claimHandler.address;
+
+    return tx;
   }
 
   /**
@@ -113,7 +121,10 @@ export class ClaimManager {
     validateNotEmpty(claimId, 'claimId');
     validateNotEmpty(resolutionNote, 'resolutionNote');
 
-    return this.claimHandler.resolveTx(claimId, resolutionNote);
+    const tx = this.claimHandler.resolveTx(claimId, resolutionNote) as IDeferredTransactionWrapper<ITxParams>;
+    tx.contractAddress = this.claimHandler.address;
+
+    return tx;
   }
 
   /**
@@ -129,7 +140,10 @@ export class ClaimManager {
   public closeTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    return this.claimHandler.closeTx(claimId);
+    const tx = this.claimHandler.closeTx(claimId) as IDeferredTransactionWrapper<ITxParams>;
+    tx.contractAddress = this.claimHandler.address;
+
+    return tx;
   }
 
   // #endregion
@@ -190,7 +204,10 @@ export class ClaimManager {
 
     const bcTokens = floatTokensToBlockchain(new BigNumber(tokens));
 
-    return this.monethaToken.approveTx(this.claimHandler.address, bcTokens);
+    const tx = this.monethaToken.approveTx(this.claimHandler.address, bcTokens) as IDeferredTransactionWrapper<ITxParams>;
+    tx.contractAddress = this.monethaToken.address;
+
+    return tx;
   }
 
   /**

@@ -38,7 +38,9 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(respondentId, 'payload.respondentId');
         validation_1.validateNotEmpty(tokens, 'payload.tokens');
         var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens));
-        return this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
+        var tx = this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
+        tx.contractAddress = this.claimHandler.address;
+        return tx;
     };
     /**
      * Creates transaction for accepting a dispute.
@@ -52,7 +54,9 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.acceptTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
-        return this.claimHandler.acceptTx(claimId);
+        var tx = this.claimHandler.acceptTx(claimId);
+        tx.contractAddress = this.claimHandler.address;
+        return tx;
     };
     /**
      * Creates transaction for resolving a dispute.
@@ -63,7 +67,9 @@ var ClaimManager = /** @class */ (function () {
     ClaimManager.prototype.resolveTx = function (claimId, resolutionNote) {
         validation_1.validateNotEmpty(claimId, 'claimId');
         validation_1.validateNotEmpty(resolutionNote, 'resolutionNote');
-        return this.claimHandler.resolveTx(claimId, resolutionNote);
+        var tx = this.claimHandler.resolveTx(claimId, resolutionNote);
+        tx.contractAddress = this.claimHandler.address;
+        return tx;
     };
     /**
      * Creates transaction for closing a dispute.
@@ -77,7 +83,9 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.closeTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
-        return this.claimHandler.closeTx(claimId);
+        var tx = this.claimHandler.closeTx(claimId);
+        tx.contractAddress = this.claimHandler.address;
+        return tx;
     };
     // #endregion
     // #region -------------- Dispute retrieval -------------------------------------------------------------------
@@ -124,7 +132,9 @@ var ClaimManager = /** @class */ (function () {
     ClaimManager.prototype.allowTx = function (tokens) {
         validation_1.validateNotEmpty(tokens, 'tokens');
         var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens));
-        return this.monethaToken.approveTx(this.claimHandler.address, bcTokens);
+        var tx = this.monethaToken.approveTx(this.claimHandler.address, bcTokens);
+        tx.contractAddress = this.monethaToken.address;
+        return tx;
     };
     /**
      * Creates transaction which clears existing amount of MTH tokens which are allowed to be transfered from user's wallet to claims contract
