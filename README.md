@@ -34,7 +34,7 @@ npm install git+https://github.com/monetha/claims-js-sdk.git --save
 
 ## Usage
 
-In order to better understand the use cases of the `claims-js-sdk` please refer to [Monetha Payment layer: Dispute resolution](https://github.com/monetha/payment-layer#dispute-resolution).
+In order to better understand the use cases of the `claims-sdk` please refer to [Monetha Payment layer: Dispute resolution](https://github.com/monetha/payment-layer#dispute-resolution).
 
 ### Example
 
@@ -193,7 +193,7 @@ const tx = claimManager.allowTx(newAllowance);
 
 ## Contributing
 
-Thank you for considering to help out with the source code! We welcome contributions from anyone on the internet, and are grateful for even the smallest of fixes! If you'd like to contribute to `claims-js-sdk`, please fork, fix, commit and send a pull request for the maintainers to review and merge into the main code base.  Feel free to register issues and suggestions.
+Thank you for considering to help out with the source code! We welcome contributions from anyone on the internet, and are grateful for even the smallest of fixes! If you'd like to contribute to `claims-sdk`, please fork, fix, commit and send a pull request for the maintainers to review and merge into the main code base.  Feel free to register issues and suggestions.
 
 #### Contracts update
 
