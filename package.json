@@ -13,7 +13,7 @@
 		"test": "mocha --timeout 200000",
 		"build": "./node_modules/.bin/tsc && tscpaths -p tsconfig.json -s ./src -o ./dist ",
 		"lint": "tslint --project tsconfig.json",
-		"prepare-contracts": "typechain --target=legacy"
+		"prepare-contracts": "typechain --target=web3-1.0.0 --outDir=src/contracts"
 	},
 	"husky": {
 		"hooks": {
@@ -35,7 +35,8 @@
 	"dependencies": {
 		"abi-decoder": "^1.2.0",
 		"bignumber.js": "^8.1.1",
-		"tscpaths": "0.0.7"
+		"tscpaths": "0.0.7",
+		"web3": "^1.0.0-beta.55"
 	},
 	"repository": {
 		"type": "git",

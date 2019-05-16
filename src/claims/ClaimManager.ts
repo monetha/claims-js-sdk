@@ -4,13 +4,15 @@ import { MonethaToken } from 'src/contracts/MonethaToken';
 import { IClaim } from 'src/models/claim';
 import { blockchainTokensToFloat, floatTokensToBlockchain } from 'src/utils/conversion';
 import { validateNotEmpty } from 'src/utils/validation';
-import { IDeferredTransactionWrapper } from 'src/models/tx';
-import { ITxParams } from 'src/contracts/typechain-runtime';
+import * as claimsHandlerContractAbi from '../contracts/MonethaClaimHandler.json';
+import * as monethaTokenContractAbi from '../contracts/MonethaToken.json';
+import Web3 from "web3";
+import {AbiItem} from 'web3-utils';
 
 // #region -------------- Interfaces -------------------------------------------------------------------
 
 export interface IOptions {
-  web3: any,
+  web3: Web3,
   claimsHandlerContractAddress: string,
   monethaTokenContractAddress: string,
 }
@@ -60,8 +62,8 @@ export class ClaimManager {
     validateNotEmpty(claimsHandlerContractAddress, 'options.claimsHandlerContractAddress');
     validateNotEmpty(monethaTokenContractAddress, 'options.monethaTokenContractAddress');
 
-    this.claimHandler = new MonethaClaimHandler(web3, claimsHandlerContractAddress);
-    this.monethaToken = new MonethaToken(web3, monethaTokenContractAddress);
+    this.claimHandler = new web3.eth.Contract(claimsHandlerContractAbi as AbiItem[], claimsHandlerContractAddress) as MonethaClaimHandler;
+    this.monethaToken = new web3.eth.Contract(monethaTokenContractAbi as AbiItem[], monethaTokenContractAddress) as MonethaToken;
   }
 
   // #region -------------- Dispute actions -------------------------------------------------------------------
@@ -84,10 +86,9 @@ export class ClaimManager {
     validateNotEmpty(respondentId, 'payload.respondentId');
     validateNotEmpty(tokens, 'payload.tokens');
 
-    const bcTokens = floatTokensToBlockchain(new BigNumber(tokens));
+    const bcTokens = floatTokensToBlockchain(new BigNumber(tokens)).toString();
 
-    const tx = this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens) as IDeferredTransactionWrapper<ITxParams>;
-    tx.contractAddress = this.claimHandler.address;
+    const tx = this.claimHandler.methods.create(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
 
     return tx;
   }
@@ -105,8 +106,7 @@ export class ClaimManager {
   public acceptTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    const tx = this.claimHandler.acceptTx(claimId) as IDeferredTransactionWrapper<ITxParams>;
-    tx.contractAddress = this.claimHandler.address;
+    const tx = this.claimHandler.methods.accept(claimId);
 
     return tx;
   }
@@ -121,8 +121,7 @@ export class ClaimManager {
     validateNotEmpty(claimId, 'claimId');
     validateNotEmpty(resolutionNote, 'resolutionNote');
 
-    const tx = this.claimHandler.resolveTx(claimId, resolutionNote) as IDeferredTransactionWrapper<ITxParams>;
-    tx.contractAddress = this.claimHandler.address;
+    const tx = this.claimHandler.methods.resolve(claimId, resolutionNote);
 
     return tx;
   }
@@ -140,8 +139,7 @@ export class ClaimManager {
   public closeTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    const tx = this.claimHandler.closeTx(claimId) as IDeferredTransactionWrapper<ITxParams>;
-    tx.contractAddress = this.claimHandler.address;
+    const tx = this.claimHandler.methods.close(claimId);
 
     return tx;
   }
@@ -156,33 +154,20 @@ export class ClaimManager {
   public async getClaim(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    const bcClaim: [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      string,
-      string,
-      string,
-      string,
-      BigNumber,
-      string,
-      string,
-      BigNumber,
-      string
-    ] = await this.claimHandler.claims(claimId);
+    const bcClaim = await this.claimHandler.methods.claims(claimId).call();
 
     const claim: IClaim = {
       id: claimId,
-      stateId: bcClaim[0].toNumber(),
-      modifiedAt: new Date(bcClaim[1].toNumber() * 1000).toISOString(),
-      dealId: bcClaim[2].toNumber(),
-      reasonNote: bcClaim[4],
-      requesterId: bcClaim[5],
-      requesterAddress: bcClaim[6],
-      requesterStaked: blockchainTokensToFloat(bcClaim[7]),
-      respondentId: bcClaim[8],
-      respondentAddress: bcClaim[9],
-      resolutionNote: bcClaim[11],
+      stateId: Number(bcClaim.state),
+      modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
+      dealId: Number(bcClaim.dealId),
+      reasonNote: bcClaim.reasonNote,
+      requesterId: bcClaim.requesterId,
+      requesterAddress: bcClaim.requesterAddress,
+      requesterStaked: blockchainTokensToFloat(new BigNumber(bcClaim.requesterStaked)),
+      respondentId: bcClaim.respondentId,
+      respondentAddress: bcClaim.respondentAddress,
+      resolutionNote: bcClaim.resolutionNote,
       contractAddress: this.claimHandler.address,
     };
 
@@ -202,10 +187,9 @@ export class ClaimManager {
   public allowTx(tokens: BigNumber) {
     validateNotEmpty(tokens, 'tokens');
 
-    const bcTokens = floatTokensToBlockchain(new BigNumber(tokens));
+    const bcTokens = floatTokensToBlockchain(new BigNumber(tokens)).toString();
 
-    const tx = this.monethaToken.approveTx(this.claimHandler.address, bcTokens) as IDeferredTransactionWrapper<ITxParams>;
-    tx.contractAddress = this.monethaToken.address;
+    const tx = this.monethaToken.methods.approve(this.claimHandler.address, bcTokens);
 
     return tx;
   }
@@ -223,9 +207,9 @@ export class ClaimManager {
   public async getAllowance(walletAddress: string) {
     validateNotEmpty(walletAddress, 'walletAddress');
 
-    const allowance = await this.monethaToken.allowance(walletAddress, this.claimHandler.address);
+    const allowance = await this.monethaToken.methods.allowance(walletAddress, this.claimHandler.address).call();
 
-    return blockchainTokensToFloat(allowance);
+    return blockchainTokensToFloat(new BigNumber(allowance));
   }
 
   // #endregion
