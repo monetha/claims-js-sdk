@@ -53,6 +53,7 @@ export interface ICreateClaimPayload {
 export class ClaimManager {
   public monethaToken: MonethaToken;
   public claimHandler: MonethaClaimHandler;
+  public web3: Web3;
 
   public constructor(options: IOptions) {
     validateNotEmpty(options, 'options');
@@ -64,6 +65,7 @@ export class ClaimManager {
 
     this.claimHandler = new web3.eth.Contract(claimsHandlerContractAbi as AbiItem[], claimsHandlerContractAddress) as MonethaClaimHandler;
     this.monethaToken = new web3.eth.Contract(monethaTokenContractAbi as AbiItem[], monethaTokenContractAddress) as MonethaToken;
+    this.web3 = web3;
   }
 
   // #region -------------- Dispute actions -------------------------------------------------------------------
@@ -86,9 +88,16 @@ export class ClaimManager {
     validateNotEmpty(respondentId, 'payload.respondentId');
     validateNotEmpty(tokens, 'payload.tokens');
 
-    const bcTokens = floatTokensToBlockchain(new BigNumber(tokens)).toString();
+    const bcTokens = floatTokensToBlockchain(tokens).toString();
 
-    const tx = this.claimHandler.methods.create(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
+    const [
+        dealHashBytes,
+        reasonBytes,
+        requesterIdBytes,
+        respondentIdBytes,
+    ] = ['1', reason, requesterId, respondentId].map(v => this.web3.utils.fromAscii(v));
+
+    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reasonBytes, requesterIdBytes, respondentIdBytes, bcTokens);
 
     return tx;
   }
@@ -163,10 +172,10 @@ export class ClaimManager {
       dealId: Number(bcClaim.dealId),
       reasonNote: bcClaim.reasonNote,
       requesterId: bcClaim.requesterId,
-      requesterAddress: bcClaim.requesterAddress,
+      requesterAddress: bcClaim.requesterAddress.toLowerCase(),
       requesterStaked: blockchainTokensToFloat(new BigNumber(bcClaim.requesterStaked)),
       respondentId: bcClaim.respondentId,
-      respondentAddress: bcClaim.respondentAddress,
+      respondentAddress: bcClaim.respondentAddress.toLowerCase(),
       resolutionNote: bcClaim.resolutionNote,
       contractAddress: this.claimHandler.address,
     };

@@ -19,6 +19,7 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(monethaTokenContractAddress, 'options.monethaTokenContractAddress');
         this.claimHandler = new web3.eth.Contract(claimsHandlerContractAbi, claimsHandlerContractAddress);
         this.monethaToken = new web3.eth.Contract(monethaTokenContractAbi, monethaTokenContractAddress);
+        this.web3 = web3;
     }
     // #region -------------- Dispute actions -------------------------------------------------------------------
     /**
@@ -30,6 +31,7 @@ var ClaimManager = /** @class */ (function () {
      * wallet to claims handler contract. You can check existing allowance by calling `getAllowance` method and approve allowance by `allowTx`
      */
     ClaimManager.prototype.createTx = function (payload) {
+        var _this = this;
         validation_1.validateNotEmpty(payload, 'payload');
         var dealId = payload.dealId, reason = payload.reason, requesterId = payload.requesterId, respondentId = payload.respondentId, tokens = payload.tokens;
         validation_1.validateNotEmpty(dealId, 'payload.dealId');
@@ -37,8 +39,9 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(requesterId, 'payload.requesterId');
         validation_1.validateNotEmpty(respondentId, 'payload.respondentId');
         validation_1.validateNotEmpty(tokens, 'payload.tokens');
-        var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens)).toString();
-        var tx = this.claimHandler.methods.create(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
+        var bcTokens = conversion_1.floatTokensToBlockchain(tokens).toString();
+        var _a = ['1', reason, requesterId, respondentId].map(function (v) { return _this.web3.utils.fromAscii(v); }), dealHashBytes = _a[0], reasonBytes = _a[1], requesterIdBytes = _a[2], respondentIdBytes = _a[3];
+        var tx = this.claimHandler.methods.create(dealId, dealHashBytes, reasonBytes, requesterIdBytes, respondentIdBytes, bcTokens);
         return tx;
     };
     /**
@@ -105,10 +108,10 @@ var ClaimManager = /** @class */ (function () {
                             dealId: Number(bcClaim.dealId),
                             reasonNote: bcClaim.reasonNote,
                             requesterId: bcClaim.requesterId,
-                            requesterAddress: bcClaim.requesterAddress,
+                            requesterAddress: bcClaim.requesterAddress.toLowerCase(),
                             requesterStaked: conversion_1.blockchainTokensToFloat(new bignumber_js_1.default(bcClaim.requesterStaked)),
                             respondentId: bcClaim.respondentId,
-                            respondentAddress: bcClaim.respondentAddress,
+                            respondentAddress: bcClaim.respondentAddress.toLowerCase(),
                             resolutionNote: bcClaim.resolutionNote,
                             contractAddress: this.claimHandler.address,
                         };

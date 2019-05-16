@@ -36,6 +36,7 @@ export interface ICreateClaimPayload {
 export declare class ClaimManager {
     monethaToken: MonethaToken;
     claimHandler: MonethaClaimHandler;
+    web3: Web3;
     constructor(options: IOptions);
     /**
      * Creates transaction for opening a dispute.
