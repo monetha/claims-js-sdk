@@ -40,8 +40,8 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(respondentId, 'payload.respondentId');
         validation_1.validateNotEmpty(tokens, 'payload.tokens');
         var bcTokens = conversion_1.floatTokensToBlockchain(tokens).toString();
-        var _a = ['1', reason, requesterId, respondentId].map(function (v) { return _this.web3.utils.fromAscii(v); }), dealHashBytes = _a[0], reasonBytes = _a[1], requesterIdBytes = _a[2], respondentIdBytes = _a[3];
-        var tx = this.claimHandler.methods.create(dealId, dealHashBytes, reasonBytes, requesterIdBytes, respondentIdBytes, bcTokens);
+        var _a = ['1', requesterId, respondentId].map(function (v) { return _this.web3.utils.fromAscii(v); }), dealHashBytes = _a[0], requesterIdBytes = _a[1], respondentIdBytes = _a[2];
+        var tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens);
         return tx;
     };
     /**
@@ -107,10 +107,10 @@ var ClaimManager = /** @class */ (function () {
                             modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
                             dealId: Number(bcClaim.dealId),
                             reasonNote: bcClaim.reasonNote,
-                            requesterId: bcClaim.requesterId,
+                            requesterId: this.web3.utils.toAscii(bcClaim.requesterId),
                             requesterAddress: bcClaim.requesterAddress.toLowerCase(),
                             requesterStaked: conversion_1.blockchainTokensToFloat(new bignumber_js_1.default(bcClaim.requesterStaked)),
-                            respondentId: bcClaim.respondentId,
+                            respondentId: this.web3.utils.toAscii(bcClaim.respondentId),
                             respondentAddress: bcClaim.respondentAddress.toLowerCase(),
                             resolutionNote: bcClaim.resolutionNote,
                             contractAddress: this.claimHandler.address,

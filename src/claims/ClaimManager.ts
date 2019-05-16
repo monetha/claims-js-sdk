@@ -92,12 +92,11 @@ export class ClaimManager {
 
     const [
         dealHashBytes,
-        reasonBytes,
         requesterIdBytes,
         respondentIdBytes,
-    ] = ['1', reason, requesterId, respondentId].map(v => this.web3.utils.fromAscii(v));
+    ] = ['1', requesterId, respondentId].map(v => this.web3.utils.fromAscii(v));
 
-    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reasonBytes, requesterIdBytes, respondentIdBytes, bcTokens);
+    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens);
 
     return tx;
   }
@@ -171,10 +170,10 @@ export class ClaimManager {
       modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
       dealId: Number(bcClaim.dealId),
       reasonNote: bcClaim.reasonNote,
-      requesterId: bcClaim.requesterId,
+      requesterId: this.web3.utils.toAscii(bcClaim.requesterId),
       requesterAddress: bcClaim.requesterAddress.toLowerCase(),
       requesterStaked: blockchainTokensToFloat(new BigNumber(bcClaim.requesterStaked)),
-      respondentId: bcClaim.respondentId,
+      respondentId: this.web3.utils.toAscii(bcClaim.respondentId),
       respondentAddress: bcClaim.respondentAddress.toLowerCase(),
       resolutionNote: bcClaim.resolutionNote,
       contractAddress: this.claimHandler.address,
