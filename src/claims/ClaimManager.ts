@@ -163,6 +163,14 @@ export class ClaimManager {
     validateNotEmpty(claimId, 'claimId');
 
     const bcClaim = await this.claimHandler.methods.claims(claimId).call();
+    let reqId = bcClaim.requesterId;
+    let resId = bcClaim.respondentId;
+    try {
+      reqId = this.web3.utils.toAscii(bcClaim.requesterId)
+      resId = this.web3.utils.toAscii(bcClaim.respondentId)
+    } catch(e) {
+      // do nothing
+    }
 
     const claim: IClaim = {
       id: claimId,
@@ -170,10 +178,10 @@ export class ClaimManager {
       modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
       dealId: Number(bcClaim.dealId),
       reasonNote: bcClaim.reasonNote,
-      requesterId: this.web3.utils.toAscii(bcClaim.requesterId),
+      requesterId: reqId,
       requesterAddress: bcClaim.requesterAddress.toLowerCase(),
       requesterStaked: blockchainTokensToFloat(new BigNumber(bcClaim.requesterStaked)),
-      respondentId: this.web3.utils.toAscii(bcClaim.respondentId),
+      respondentId: resId,
       respondentAddress: bcClaim.respondentAddress.toLowerCase(),
       resolutionNote: bcClaim.resolutionNote,
       contractAddress: this.claimHandler.address,
