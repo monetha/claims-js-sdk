@@ -9,7 +9,7 @@ var constants_1 = require("../constants");
  */
 exports.blockchainTokensToFloat = function (blockchainTokens) {
     var divider = (new bignumber_js_1.default(10)).exponentiatedBy(constants_1.MTHDecimals);
-    return blockchainTokens.div(divider);
+    return new bignumber_js_1.default(blockchainTokens).div(divider);
 };
 /**
  * Converts floating comma token value to raw value for blockchain
@@ -17,6 +17,6 @@ exports.blockchainTokensToFloat = function (blockchainTokens) {
  */
 exports.floatTokensToBlockchain = function (floatTokens) {
     var multiplier = (new bignumber_js_1.default(10)).exponentiatedBy(constants_1.MTHDecimals);
-    return floatTokens.multipliedBy(multiplier);
+    return new bignumber_js_1.default(floatTokens).multipliedBy(multiplier);
 };
 // #endregion

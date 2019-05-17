@@ -9,7 +9,7 @@ import { MTHDecimals } from 'src/constants';
  */
 export const blockchainTokensToFloat = (blockchainTokens: BigNumber) => {
   const divider = (new BigNumber(10)).exponentiatedBy(MTHDecimals);
-  return blockchainTokens.div(divider);
+  return new BigNumber(blockchainTokens).div(divider);
 }
 
 /**
@@ -18,7 +18,7 @@ export const blockchainTokensToFloat = (blockchainTokens: BigNumber) => {
  */
 export const floatTokensToBlockchain = (floatTokens: BigNumber) => {
   const multiplier = (new BigNumber(10)).exponentiatedBy(MTHDecimals);
-  return floatTokens.multipliedBy(multiplier);
+  return new BigNumber(floatTokens).multipliedBy(multiplier);
 }
 
 // #endregion

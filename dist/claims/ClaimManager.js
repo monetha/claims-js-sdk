@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
 var bignumber_js_1 = require("bignumber.js");
-var MonethaClaimHandler_1 = require("../contracts/MonethaClaimHandler");
-var MonethaToken_1 = require("../contracts/MonethaToken");
 var conversion_1 = require("../utils/conversion");
 var validation_1 = require("../utils/validation");
+var claimsHandlerContractAbi = require("../contracts/MonethaClaimHandler.json");
+var monethaTokenContractAbi = require("../contracts/MonethaToken.json");
 // #endregion
 /**
  * Allows managing disputes on Ethereum blockchain
@@ -17,8 +17,9 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(web3, 'options.web3');
         validation_1.validateNotEmpty(claimsHandlerContractAddress, 'options.claimsHandlerContractAddress');
         validation_1.validateNotEmpty(monethaTokenContractAddress, 'options.monethaTokenContractAddress');
-        this.claimHandler = new MonethaClaimHandler_1.MonethaClaimHandler(web3, claimsHandlerContractAddress);
-        this.monethaToken = new MonethaToken_1.MonethaToken(web3, monethaTokenContractAddress);
+        this.claimHandler = new web3.eth.Contract(claimsHandlerContractAbi, claimsHandlerContractAddress);
+        this.monethaToken = new web3.eth.Contract(monethaTokenContractAbi, monethaTokenContractAddress);
+        this.web3 = web3;
     }
     // #region -------------- Dispute actions -------------------------------------------------------------------
     /**
@@ -30,6 +31,7 @@ var ClaimManager = /** @class */ (function () {
      * wallet to claims handler contract. You can check existing allowance by calling `getAllowance` method and approve allowance by `allowTx`
      */
     ClaimManager.prototype.createTx = function (payload) {
+        var _this = this;
         validation_1.validateNotEmpty(payload, 'payload');
         var dealId = payload.dealId, reason = payload.reason, requesterId = payload.requesterId, respondentId = payload.respondentId, tokens = payload.tokens;
         validation_1.validateNotEmpty(dealId, 'payload.dealId');
@@ -37,9 +39,9 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(requesterId, 'payload.requesterId');
         validation_1.validateNotEmpty(respondentId, 'payload.respondentId');
         validation_1.validateNotEmpty(tokens, 'payload.tokens');
-        var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens));
-        var tx = this.claimHandler.createTx(dealId, '0x1', reason, requesterId, respondentId, bcTokens);
-        tx.contractAddress = this.claimHandler.address;
+        var bcTokens = conversion_1.floatTokensToBlockchain(tokens).toString();
+        var _a = ['1', requesterId, respondentId].map(function (v) { return _this.web3.utils.fromAscii(v); }), dealHashBytes = _a[0], requesterIdBytes = _a[1], respondentIdBytes = _a[2];
+        var tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens);
         return tx;
     };
     /**
@@ -54,8 +56,7 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.acceptTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
-        var tx = this.claimHandler.acceptTx(claimId);
-        tx.contractAddress = this.claimHandler.address;
+        var tx = this.claimHandler.methods.accept(claimId);
         return tx;
     };
     /**
@@ -67,8 +68,7 @@ var ClaimManager = /** @class */ (function () {
     ClaimManager.prototype.resolveTx = function (claimId, resolutionNote) {
         validation_1.validateNotEmpty(claimId, 'claimId');
         validation_1.validateNotEmpty(resolutionNote, 'resolutionNote');
-        var tx = this.claimHandler.resolveTx(claimId, resolutionNote);
-        tx.contractAddress = this.claimHandler.address;
+        var tx = this.claimHandler.methods.resolve(claimId, resolutionNote);
         return tx;
     };
     /**
@@ -83,8 +83,7 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.closeTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
-        var tx = this.claimHandler.closeTx(claimId);
-        tx.contractAddress = this.claimHandler.address;
+        var tx = this.claimHandler.methods.close(claimId);
         return tx;
     };
     // #endregion
@@ -99,21 +98,21 @@ var ClaimManager = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         validation_1.validateNotEmpty(claimId, 'claimId');
-                        return [4 /*yield*/, this.claimHandler.claims(claimId)];
+                        return [4 /*yield*/, this.claimHandler.methods.claims(claimId).call()];
                     case 1:
                         bcClaim = _a.sent();
                         claim = {
                             id: claimId,
-                            stateId: bcClaim[0].toNumber(),
-                            modifiedAt: new Date(bcClaim[1].toNumber() * 1000).toISOString(),
-                            dealId: bcClaim[2].toNumber(),
-                            reasonNote: bcClaim[4],
-                            requesterId: bcClaim[5],
-                            requesterAddress: bcClaim[6],
-                            requesterStaked: conversion_1.blockchainTokensToFloat(bcClaim[7]),
-                            respondentId: bcClaim[8],
-                            respondentAddress: bcClaim[9],
-                            resolutionNote: bcClaim[11],
+                            stateId: Number(bcClaim.state),
+                            modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
+                            dealId: Number(bcClaim.dealId),
+                            reasonNote: bcClaim.reasonNote,
+                            requesterId: this.web3.utils.toAscii(bcClaim.requesterId),
+                            requesterAddress: bcClaim.requesterAddress.toLowerCase(),
+                            requesterStaked: conversion_1.blockchainTokensToFloat(new bignumber_js_1.default(bcClaim.requesterStaked)),
+                            respondentId: this.web3.utils.toAscii(bcClaim.respondentId),
+                            respondentAddress: bcClaim.respondentAddress.toLowerCase(),
+                            resolutionNote: bcClaim.resolutionNote,
                             contractAddress: this.claimHandler.address,
                         };
                         return [2 /*return*/, claim];
@@ -131,9 +130,8 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.allowTx = function (tokens) {
         validation_1.validateNotEmpty(tokens, 'tokens');
-        var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens));
-        var tx = this.monethaToken.approveTx(this.claimHandler.address, bcTokens);
-        tx.contractAddress = this.monethaToken.address;
+        var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens)).toString();
+        var tx = this.monethaToken.methods.approve(this.claimHandler.address, bcTokens);
         return tx;
     };
     /**
@@ -152,10 +150,10 @@ var ClaimManager = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         validation_1.validateNotEmpty(walletAddress, 'walletAddress');
-                        return [4 /*yield*/, this.monethaToken.allowance(walletAddress, this.claimHandler.address)];
+                        return [4 /*yield*/, this.monethaToken.methods.allowance(walletAddress, this.claimHandler.address).call()];
                     case 1:
                         allowance = _a.sent();
-                        return [2 /*return*/, conversion_1.blockchainTokensToFloat(allowance)];
+                        return [2 /*return*/, conversion_1.blockchainTokensToFloat(new bignumber_js_1.default(allowance))];
                 }
             });
         });

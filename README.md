@@ -23,7 +23,7 @@ A javascript SDK for resolving disputes in a decentralized way using Ethereum bl
 ### Prerequisites
 
 - Node.js 8+
-- [web3.js](https://www.npmjs.com/package/web3) in your project
+- [web3.js](https://www.npmjs.com/package/web3) (1.0.0+) in your project
 - [bignumber.js](https://www.npmjs.com/package/big-number) in your project
 
 ### Adding to your project
@@ -96,13 +96,13 @@ const tx = claimManager.createTx({
     tokens: new BigNumber(150);
 });
 
-// claimManager only returns transaction to execute, but does not execute it itself.
+// claimManager only returns TransactionObject to execute, but does not execute it itself.
 // Your code must implement `sendAndWaitTx` or similar function which executes transaction including estimation of transaction fees.
-// Returned transaction object contains these properties:
-// - `contractAddress` - and address on which transaction must be executed
-// - `getData()` method - returns transaction data as a string
+// Returned transaction object contains:
+// - `estimateGas()` method (requires `from` field when you deal with `ClaimsHandler` contract)
+// - `encodeABI()` method which returns transaction data as a string
 // To see an example implementation of sendAndWaitTx, go to https://github.com/monetha/claims-js-sdk-example/blob/master/src/components/App/index.tsx#L459
-const receipt = await sendAndWaitTx(tx.contractAddress, tx.getData());
+const receipt = await sendAndWaitTx(walletAddress, contractAddress, tx);
 
 // `getClaimIdFromCreateTXReceipt` helper allows us extracting claim ID from transaction receipt
 const claimId = getClaimIdFromCreateTXReceipt(receipt);
@@ -129,7 +129,7 @@ const claimId = 123; // Claim ID comes from dispute creation step
 
 const tx = claimManager.acceptTx(claimId);
 
-// Execute transaction
+// Estimate gas and then execute transaction
 // ...
 ```
 
@@ -145,7 +145,7 @@ const resolution = 'I will send you a replacement';
 
 const tx = claimManager.resolveTx(claimId, resolution);
 
-// Execute transaction
+// Estimate gas and then execute transaction
 // ...
 ```
 
@@ -158,7 +158,7 @@ const claimId = 123; // Claim ID comes from dispute creation step
 
 const tx = claimManager.closeTx(claimId);
 
-// Execute transaction
+// Estimate gas and then execute transaction
 // ...
 ```
 
@@ -187,7 +187,7 @@ const newAllowance = new BigNumber(150);
 
 const tx = claimManager.allowTx(newAllowance);
 
-// Execute transaction using the wallet you want to modify allowance for
+// Executes transaction (no need to estimate gas and call the contract) using the wallet you want to modify allowance for
 // ...
 ```
 
