@@ -35,6 +35,7 @@
 	"dependencies": {
 		"abi-decoder": "^1.2.0",
 		"bignumber.js": "^8.1.1",
+		"shelljs": "^0.8.3",
 		"tscpaths": "0.0.7",
 		"web3": "^1.0.0-beta.55"
 	},

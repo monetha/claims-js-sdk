@@ -93,7 +93,7 @@ var ClaimManager = /** @class */ (function () {
      */
     ClaimManager.prototype.getClaim = function (claimId) {
         return tslib_1.__awaiter(this, void 0, void 0, function () {
-            var bcClaim, reqId, resId, claim;
+            var bcClaim, claim;
             return tslib_1.__generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -101,25 +101,16 @@ var ClaimManager = /** @class */ (function () {
                         return [4 /*yield*/, this.claimHandler.methods.claims(claimId).call()];
                     case 1:
                         bcClaim = _a.sent();
-                        reqId = bcClaim.requesterId;
-                        resId = bcClaim.respondentId;
-                        try {
-                            reqId = this.web3.utils.toAscii(bcClaim.requesterId);
-                            resId = this.web3.utils.toAscii(bcClaim.respondentId);
-                        }
-                        catch (e) {
-                            // do nothing
-                        }
                         claim = {
                             id: claimId,
                             stateId: Number(bcClaim.state),
                             modifiedAt: new Date(Number(bcClaim.modified) * 1000).toISOString(),
                             dealId: Number(bcClaim.dealId),
                             reasonNote: bcClaim.reasonNote,
-                            requesterId: reqId,
+                            requesterId: bcClaim.requesterId,
                             requesterAddress: bcClaim.requesterAddress.toLowerCase(),
                             requesterStaked: conversion_1.blockchainTokensToFloat(new bignumber_js_1.default(bcClaim.requesterStaked)),
-                            respondentId: resId,
+                            respondentId: bcClaim.respondentId,
                             respondentAddress: bcClaim.respondentAddress.toLowerCase(),
                             resolutionNote: bcClaim.resolutionNote,
                             contractAddress: this.claimHandler.address,
