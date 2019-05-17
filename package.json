@@ -1,6 +1,6 @@
 {
 	"name": "claims-sdk",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "An SDK for solving disputes in a decentralized way using Ethereum blockchain",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
 	},
 	"scripts": {
 		"test": "mocha --timeout 200000",
-		"build": "./node_modules/.bin/tsc && tscpaths -p tsconfig.json -s ./src -o ./dist ",
+		"build": "node ./scripts/build-distribution.js",
 		"lint": "tslint --project tsconfig.json",
 		"prepare-contracts": "typechain --target=web3-1.0.0 --outDir=src/contracts"
 	},
