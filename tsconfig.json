@@ -18,10 +18,5 @@
   },
   "include": [
     "./src/**/*"
-  ],
-  "files": [
-    "src/contracts/MonethaClaimHandler.d.ts",
-    "src/contracts/MonethaToken.d.ts",
-    "src/contracts/types.d.ts"
   ]
 }
