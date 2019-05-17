@@ -25,6 +25,7 @@
 		"chai": "^4.2.0",
 		"husky": "2.1.0",
 		"mocha": "^6.1.4",
+		"shelljs": "^0.8.3",
 		"tslib": "^1.9.3",
 		"tslint": "^5.16.0",
 		"tslint-config-airbnb": "^5.11.1",
@@ -35,7 +36,6 @@
 	"dependencies": {
 		"abi-decoder": "^1.2.0",
 		"bignumber.js": "^8.1.1",
-		"shelljs": "^0.8.3",
 		"tscpaths": "0.0.7",
 		"web3": "^1.0.0-beta.55"
 	},
