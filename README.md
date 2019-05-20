@@ -206,4 +206,4 @@ This SDK is dependent on [Monetha's claim handler contract](https://github.com/m
 #### Running integration tests
 
 SDK has integration tests. Please be sure that after all changes integration tests are passing. 
-Read [here](https://github.com/monetha/claims-js-sdk/integration-tests) how to run integration and manage integration tests. 
+Read [here](https://github.com/monetha/claims-js-sdk/integration-tests) how to run and manage integration tests. 
