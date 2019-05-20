@@ -10,7 +10,7 @@
 		"node": ">=8.9.0"
 	},
 	"scripts": {
-		"test": "mocha --timeout 200000",
+		"test": "cd integration-tests && npm run test",
 		"build": "node ./scripts/build-distribution.js",
 		"lint": "tslint --project tsconfig.json",
 		"prepare-contracts": "typechain --target=web3-1.0.0 --outDir=src/contracts"
@@ -22,9 +22,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^10.14.6",
-		"chai": "^4.2.0",
 		"husky": "2.1.0",
-		"mocha": "^6.1.4",
 		"shelljs": "^0.8.3",
 		"tslib": "^1.9.3",
 		"tslint": "^5.16.0",
