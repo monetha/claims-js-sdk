@@ -24,7 +24,7 @@ const ethereumNetworkUrl = 'http://127.0.0.1:8545';
 const web3 = new Web3(new Web3.providers.HttpProvider(ethereumNetworkUrl));
 
 before('Deploy Monetha Claim Handler contract and prepare accounts', async () => {
-    const accounts = await web3.eth.accounts;
+    const accounts = await web3.eth.getAccounts();
 
     OWNER = accounts[0];
     MONETHA_ACCOUNT = accounts[2];
