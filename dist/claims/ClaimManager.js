@@ -166,4 +166,3 @@ var ClaimManager = /** @class */ (function () {
     return ClaimManager;
 }());
 exports.ClaimManager = ClaimManager;
-//# sourceMappingURL=ClaimManager.js.map

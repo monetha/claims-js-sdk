@@ -20,4 +20,3 @@ function getClaimIdFromCreateTXReceipt(receipt) {
     return new bignumber_js_1.default(claimIdHex, 16).toNumber();
 }
 exports.getClaimIdFromCreateTXReceipt = getClaimIdFromCreateTXReceipt;
-//# sourceMappingURL=receipt.js.map

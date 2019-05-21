@@ -20,4 +20,3 @@ exports.floatTokensToBlockchain = function (floatTokens) {
     return new bignumber_js_1.default(floatTokens).multipliedBy(multiplier);
 };
 // #endregion
-//# sourceMappingURL=conversion.js.map

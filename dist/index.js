@@ -6,4 +6,3 @@ var ClaimManager_1 = require("./claims/ClaimManager");
 exports.ClaimManager = ClaimManager_1.ClaimManager;
 var receipt_1 = require("./utils/receipt");
 exports.getClaimIdFromCreateTXReceipt = receipt_1.getClaimIdFromCreateTXReceipt;
-//# sourceMappingURL=index.js.map
