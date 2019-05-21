@@ -57,7 +57,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.allowTx(newAllowance);
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(token.address);
+        expect(tx.to.toLowerCase()).to.equal(token.address);
         expect(tx).to.have.property('input');
     });
 
@@ -78,7 +78,7 @@ describe('Claims js-sdk smoke tests', function () {
         });
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(claimHandler.address);
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
 
         const receipt = await web3.eth.getTransactionReceipt(tx.hash);
@@ -92,7 +92,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.allowTx(newAllowance);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(token.address);
+        expect(tx.to.toLowerCase()).to.equal(token.address);
         expect(tx).to.have.property('input');
     });
 
@@ -102,7 +102,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.acceptTx(claimId);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(claimHandler.address);
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 
@@ -113,7 +113,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.resolveTx(claimId, resolution);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(claimHandler.address);
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 
@@ -123,7 +123,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.closeTx(claimId);
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(claimHandler.address);
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 });
