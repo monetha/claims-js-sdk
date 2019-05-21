@@ -12,11 +12,11 @@ export interface IOptions {
 export interface ICreateClaimPayload {
     /**
      * Id of deal which dispute is being opened for
-     **/
+     */
     dealId: number;
     /**
      * Description of the reason for the dispute
-     **/
+     */
     reason: string;
     /**
      * Dispute requester's id

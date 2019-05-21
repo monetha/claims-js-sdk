@@ -10,7 +10,7 @@ import { MTHDecimals } from 'src/constants';
 export const blockchainTokensToFloat = (blockchainTokens: BigNumber) => {
   const divider = (new BigNumber(10)).exponentiatedBy(MTHDecimals);
   return new BigNumber(blockchainTokens).div(divider);
-}
+};
 
 /**
  * Converts floating comma token value to raw value for blockchain
@@ -19,6 +19,6 @@ export const blockchainTokensToFloat = (blockchainTokens: BigNumber) => {
 export const floatTokensToBlockchain = (floatTokens: BigNumber) => {
   const multiplier = (new BigNumber(10)).exponentiatedBy(MTHDecimals);
   return new BigNumber(floatTokens).multipliedBy(multiplier);
-}
+};
 
 // #endregion

@@ -22,12 +22,12 @@ export interface ICreateClaimPayload {
 
   /**
    * Id of deal which dispute is being opened for
-   **/
+   */
   dealId: number;
 
   /**
    * Description of the reason for the dispute
-   **/
+   */
   reason: string;
 
   /**
@@ -97,7 +97,14 @@ export class ClaimManager {
         respondentIdBytes,
     ] = ['1', requesterId, respondentId].map(v => this.web3.utils.fromAscii(v));
 
-    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens) as ITransactionObject<void>;
+    const tx = this.claimHandler.methods.create(
+        dealId,
+        dealHashBytes,
+        reason,
+        requesterIdBytes,
+        respondentIdBytes,
+        bcTokens,
+    ) as ITransactionObject<void>;
     tx.contractAddress = this.claimHandler.address;
 
     return tx;
