@@ -6,15 +6,16 @@ import { blockchainTokensToFloat, floatTokensToBlockchain } from 'src/utils/conv
 import { validateNotEmpty } from 'src/utils/validation';
 import * as claimsHandlerContractAbi from '../contracts/MonethaClaimHandler.json';
 import * as monethaTokenContractAbi from '../contracts/MonethaToken.json';
-import Web3 from "web3";
-import {AbiItem} from 'web3-utils';
+import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
+import { ITransactionObject } from 'src/models/tx';
 
 // #region -------------- Interfaces -------------------------------------------------------------------
 
 export interface IOptions {
-  web3: Web3,
-  claimsHandlerContractAddress: string,
-  monethaTokenContractAddress: string,
+  web3: Web3;
+  claimsHandlerContractAddress: string;
+  monethaTokenContractAddress: string;
 }
 
 export interface ICreateClaimPayload {
@@ -78,7 +79,7 @@ export class ClaimManager {
    * IMPORTANT: Transaction will only succeed if Monetha token contract has enough allowance to transfer staked MTH tokens from user's
    * wallet to claims handler contract. You can check existing allowance by calling `getAllowance` method and approve allowance by `allowTx`
    */
-  public createTx(payload: ICreateClaimPayload) {
+  public createTx(payload: ICreateClaimPayload): ITransactionObject<void> {
     validateNotEmpty(payload, 'payload');
 
     const { dealId, reason, requesterId, respondentId, tokens } = payload;
@@ -96,7 +97,8 @@ export class ClaimManager {
         respondentIdBytes,
     ] = ['1', requesterId, respondentId].map(v => this.web3.utils.fromAscii(v));
 
-    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens);
+    const tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens) as ITransactionObject<void>;
+    tx.contractAddress = this.claimHandler.address;
 
     return tx;
   }
@@ -114,7 +116,8 @@ export class ClaimManager {
   public acceptTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    const tx = this.claimHandler.methods.accept(claimId);
+    const tx = this.claimHandler.methods.accept(claimId) as ITransactionObject<void>;
+    tx.contractAddress = this.claimHandler.address;
 
     return tx;
   }
@@ -129,7 +132,8 @@ export class ClaimManager {
     validateNotEmpty(claimId, 'claimId');
     validateNotEmpty(resolutionNote, 'resolutionNote');
 
-    const tx = this.claimHandler.methods.resolve(claimId, resolutionNote);
+    const tx = this.claimHandler.methods.resolve(claimId, resolutionNote) as ITransactionObject<void>;
+    tx.contractAddress = this.claimHandler.address;
 
     return tx;
   }
@@ -147,7 +151,8 @@ export class ClaimManager {
   public closeTx(claimId: number) {
     validateNotEmpty(claimId, 'claimId');
 
-    const tx = this.claimHandler.methods.close(claimId);
+    const tx = this.claimHandler.methods.close(claimId) as ITransactionObject<void>;
+    tx.contractAddress = this.claimHandler.address;
 
     return tx;
   }
@@ -197,7 +202,8 @@ export class ClaimManager {
 
     const bcTokens = floatTokensToBlockchain(new BigNumber(tokens)).toString();
 
-    const tx = this.monethaToken.methods.approve(this.claimHandler.address, bcTokens);
+    const tx = this.monethaToken.methods.approve(this.claimHandler.address, bcTokens) as ITransactionObject<boolean>;
+    tx.contractAddress = this.monethaToken.address;
 
     return tx;
   }
