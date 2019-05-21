@@ -3,7 +3,7 @@ const chai = require('chai');
 chai.use(require('chai-moment'));
 const Web3 = require('web3');
 const bignumber = require('bignumber.js');
-const sdk = require('claims-sdk');
+const sdk = require('../../dist');
 const MIN_STAKE = 15000000; // 150 MTH
 const helper = require("./helpers/truffleTestHelper");
 
@@ -129,19 +129,26 @@ describe('Claims js-sdk smoke tests', function () {
 });
 
 async function submitTransaction(tx_data, from) {
-    const tx = await web3.eth.sendTransaction({
-        from: from,
+    const gas = await tx_data.estimateGas({from});
+    const txConfig = {
+        from,
         to: tx_data.contractAddress,
         nonce: await web3.eth.getTransactionCount(from), // get correct nonce
         gasPrice: await web3.eth.getGasPrice(),
-        gas: await web3.eth.estimateGas({
-            data: tx_data.getData(),
-            from,
-            to: tx_data.contractAddress,
-        }),
+        gas,
         value: '0x0',
-        data: tx_data.getData(),
+        data: tx_data.encodeABI(),
+    };
+
+    return new Promise(async (success, reject) => {
+        try {
+            await web3.eth.sendTransaction(txConfig)
+              .on('transactionHash', async hash => {
+                  const transaction = await web3.eth.getTransaction(hash);
+                  success(transaction);
+              })
+        } catch (e) {
+            reject(e);
+        }
     });
-    let transaction = web3.eth.getTransaction(tx);
-    return transaction;
 }

@@ -32,3 +32,4 @@ var ClaimStatus;
      */
     ClaimStatus[ClaimStatus["Closed"] = 7] = "Closed";
 })(ClaimStatus = exports.ClaimStatus || (exports.ClaimStatus = {}));
+//# sourceMappingURL=claim.js.map
