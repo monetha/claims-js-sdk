@@ -1,4 +1,4 @@
-import {TransactionObject} from 'src/contracts/types';
+import { TransactionObject } from 'src/contracts/types';
 
 export interface ITransactionReceipt {
   blockHash?: string;
