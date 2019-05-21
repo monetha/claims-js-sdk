@@ -3,7 +3,7 @@ const chai = require('chai');
 chai.use(require('chai-moment'));
 const Web3 = require('web3');
 const bignumber = require('bignumber.js');
-const sdk = require('claims-sdk');
+const sdk = require('../../dist');
 const MIN_STAKE = 15000000; // 150 MTH
 const helper = require("./helpers/truffleTestHelper");
 
@@ -57,7 +57,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.allowTx(newAllowance);
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(token.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(token.address);
         expect(tx).to.have.property('input');
     });
 
@@ -78,7 +78,7 @@ describe('Claims js-sdk smoke tests', function () {
         });
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(claimHandler.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
 
         const receipt = await web3.eth.getTransactionReceipt(tx.hash);
@@ -92,7 +92,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.allowTx(newAllowance);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(token.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(token.address);
         expect(tx).to.have.property('input');
     });
 
@@ -102,7 +102,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.acceptTx(claimId);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(claimHandler.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 
@@ -113,7 +113,7 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.resolveTx(claimId, resolution);
         const tx = await submitTransaction(tx_data, RESPONDENT);
         // Then
-        expect(tx.to).to.equal(claimHandler.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 
@@ -123,25 +123,32 @@ describe('Claims js-sdk smoke tests', function () {
         const tx_data = claimManager.closeTx(claimId);
         const tx = await submitTransaction(tx_data, REQUESTER);
         // Then
-        expect(tx.to).to.equal(claimHandler.address.toLowerCase());
+        expect(tx.to.toLowerCase()).to.equal(claimHandler.address);
         expect(tx).to.have.property('input');
     });
 });
 
 async function submitTransaction(tx_data, from) {
-    const tx = await web3.eth.sendTransaction({
-        from: from,
+    const gas = await tx_data.estimateGas({from});
+    const txConfig = {
+        from,
         to: tx_data.contractAddress,
         nonce: await web3.eth.getTransactionCount(from), // get correct nonce
         gasPrice: await web3.eth.getGasPrice(),
-        gas: await web3.eth.estimateGas({
-            data: tx_data.getData(),
-            from,
-            to: tx_data.contractAddress,
-        }),
+        gas,
         value: '0x0',
-        data: tx_data.getData(),
+        data: tx_data.encodeABI(),
+    };
+
+    return new Promise(async (success, reject) => {
+        try {
+            await web3.eth.sendTransaction(txConfig)
+              .on('transactionHash', async hash => {
+                  const transaction = await web3.eth.getTransaction(hash);
+                  success(transaction);
+              })
+        } catch (e) {
+            reject(e);
+        }
     });
-    let transaction = web3.eth.getTransaction(tx);
-    return transaction;
 }

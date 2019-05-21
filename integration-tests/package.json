@@ -20,7 +20,6 @@
     "chai": "^4.1.2",
     "chai-bignumber": "^2.0.2",
     "chai-moment": "^0.1.0",
-    "claims-sdk": "git+https://github.com/monetha/claims-js-sdk.git#2.0.0",
     "mocha": "^6.1.4",
     "ganache-cli": "^6.4.3",
     "monetha-utility-contracts": "git+https://github.com/monetha/utility-contracts.git",
