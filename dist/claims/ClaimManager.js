@@ -42,6 +42,7 @@ var ClaimManager = /** @class */ (function () {
         var bcTokens = conversion_1.floatTokensToBlockchain(tokens).toString();
         var _a = ['1', requesterId, respondentId].map(function (v) { return _this.web3.utils.fromAscii(v); }), dealHashBytes = _a[0], requesterIdBytes = _a[1], respondentIdBytes = _a[2];
         var tx = this.claimHandler.methods.create(dealId, dealHashBytes, reason, requesterIdBytes, respondentIdBytes, bcTokens);
+        tx.contractAddress = this.claimHandler.address;
         return tx;
     };
     /**
@@ -57,6 +58,7 @@ var ClaimManager = /** @class */ (function () {
     ClaimManager.prototype.acceptTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
         var tx = this.claimHandler.methods.accept(claimId);
+        tx.contractAddress = this.claimHandler.address;
         return tx;
     };
     /**
@@ -69,6 +71,7 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(claimId, 'claimId');
         validation_1.validateNotEmpty(resolutionNote, 'resolutionNote');
         var tx = this.claimHandler.methods.resolve(claimId, resolutionNote);
+        tx.contractAddress = this.claimHandler.address;
         return tx;
     };
     /**
@@ -84,6 +87,7 @@ var ClaimManager = /** @class */ (function () {
     ClaimManager.prototype.closeTx = function (claimId) {
         validation_1.validateNotEmpty(claimId, 'claimId');
         var tx = this.claimHandler.methods.close(claimId);
+        tx.contractAddress = this.claimHandler.address;
         return tx;
     };
     // #endregion
@@ -132,6 +136,7 @@ var ClaimManager = /** @class */ (function () {
         validation_1.validateNotEmpty(tokens, 'tokens');
         var bcTokens = conversion_1.floatTokensToBlockchain(new bignumber_js_1.default(tokens)).toString();
         var tx = this.monethaToken.methods.approve(this.claimHandler.address, bcTokens);
+        tx.contractAddress = this.monethaToken.address;
         return tx;
     };
     /**

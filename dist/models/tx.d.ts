@@ -1,3 +1,4 @@
+import { TransactionObject } from '../contracts/types';
 export interface ITransactionReceipt {
     blockHash?: string;
     blockNumber?: string;
@@ -11,4 +12,7 @@ export interface ITransactionReceipt {
     to?: string;
     transactionHash?: string;
     transactionIndex?: string;
+}
+export interface ITransactionObject<T> extends TransactionObject<T> {
+    contractAddress?: string;
 }
