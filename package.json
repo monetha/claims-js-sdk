@@ -1,6 +1,6 @@
 {
 	"name": "claims-sdk",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "An SDK for solving disputes in a decentralized way using Ethereum blockchain",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
